@@ -1,6 +1,11 @@
 // import state class for instanceof check
-const StateNode = require('./stateNode.js');
-const SiloNode = require('./siloNode.js');
+// const StateNode = require('./stateNode.js');
+// const SiloNode = require('./SiloNode.js');
+
+// import state class for instanceof check
+import StateNode from './stateNode.js';
+import SiloNode from './siloNode.js';
+import React from 'react';
 
 // ==================> SILO TESTING <=================== \\
 
@@ -9,22 +14,13 @@ const SiloNode = require('./siloNode.js');
 
 // AppState.initializeState({
 //   name: 'Han',
-//   age: 25,
-//   cart: {one:[1,2,3], two:2}
+//   age: 25
 // })
 
 // AppState.initializeModifiers({
 //   age: {
 //     incrementAge: (current, payload) => {
 //       return current + payload;
-//     }
-//   },
-//   cart: {
-//     increment: (current, index, payload) => {
-//       return ++current;
-//     },
-//     addItem: (current, payload) => {
-//       return current.push(payload);
 //     }
 //   }
 // });
@@ -33,8 +29,20 @@ const SiloNode = require('./siloNode.js');
 // NavState.parent = 'AppState';
 
 // NavState.initializeState({
-//   nav: 'Nav'
+//   cart: []
 // })
+
+// NavState.initializeModifiers({
+//   cart: {
+//     increment: (current, index, payload) => {
+//       return ++current;
+//     },
+//     addItem: (current, payload) => {
+//       current.push(payload);
+//       return current;
+//     }
+//   }
+// });
 
 // const ButtState = new StateNode('ButtState');
 // ButtState.parent = 'NavState';
@@ -95,22 +103,25 @@ function handleNestedObject(objName, obj, parent) {
     type = 'OBJECT'
   }
 
-  const node = new SiloNode(objChildren, parent, obj.modifiers, type);
+  const node = new SiloNode(objName, objChildren, parent, obj.modifiers, type);
   
   if (Array.isArray(obj.value) && obj.value.length > 0) {
     obj.value.forEach((val, i) => {
       if (typeof val === 'object') objChildren[`${objName}_${i}`] = handleNestedObject(`${objName}_${i}`, {value: val}, node);
-      else objChildren[`${objName}_${i}`] = new SiloNode(val, node);
+      else objChildren[`${objName}_${i}`] = new SiloNode(`${objName}_${i}`, val, node);
     })
   } 
   
   else if (keys.length > 0) {
     keys.forEach(key => {
       if (typeof obj.value[key] === 'object') objChildren[`${objName}_${key}`] = handleNestedObject(key, {value: obj.value[key]}, node);
-      else objChildren[`${objName}_${key}`] = new SiloNode(obj.value[key], node);
+      else objChildren[`${objName}_${key}`] = new SiloNode(`${objName}_${key}`, obj.value[key], node);
     })
   }
 
+  // method below created to ensure that all values have been added to the objChild before
+  // modifiers are linked (needed for objects)
+  node.runLinkModifiers(objName); // this one is fine
   return node;
 }
 
@@ -125,7 +136,8 @@ function combineNodes(...args) {
   const hashTable = {};
   args.forEach(node => {
     // all nodes must be an instance of state node (must import state class)
-    if (!(node instanceof StateNode)) throw new Error('only state objects can be passed into combineNodes');
+    //console.log(node, node instanceof StateNode);
+    //if (!(node instanceof StateNode)) throw new Error('only state objects can be passed into combineNodes');
 
     if (node.parent === null) {
       // only one node can be the root
@@ -158,7 +170,7 @@ function combineNodes(...args) {
     hashTable[nodeName].forEach(child => {
 
       const nodeVal = {};
-      allChildren[child.name] = new SiloNode(nodeVal, parent, {}, 'NESTEDSTATE');
+      allChildren[child.name] = new SiloNode(child.name, nodeVal, parent, {}, 'NESTEDSTATE');
       const thisStateNode = child;
       const thisSiloNode = allChildren[child.name];
       const stateObj = child.state;
@@ -170,7 +182,7 @@ function combineNodes(...args) {
           nodeVal[varName] = handleNestedObject(varName, stateObj[varName], thisSiloNode);
         }
         // primitives only
-        else nodeVal[varName] = new SiloNode(stateObj[varName].value, thisSiloNode, stateObj[varName].modifiers);
+        else nodeVal[varName] = new SiloNode(varName, stateObj[varName].value, thisSiloNode, stateObj[varName].modifiers);
       })
 
       // recurse for grandbabiessss
@@ -191,13 +203,113 @@ function combineNodes(...args) {
   Object.keys(temp).forEach(key => {
     silo[key] = temp[key];
   });
+  
+  applyToSilo(node => {
+    if(node.type === 'OBJECT' || node.type === "ARRAY"){
+      node.modifiers.keySubscribe = (key, ComponentToBind) => {
+        const name = node.name + "_" + key;
+        return class Component extends React.Component {
+            constructor() {
+              super();
+
+              this.updateComponent = this.updateComponent.bind(this);
+            }
+
+            render() {
+              let newState = {};
+              if(this.updatedState) {
+                newState = this.updatedState;
+              }
+              return (<ComponentToBind {...this.props} {...newState} />);
+            }
+
+            updateComponent(updatedState) {
+                this.updatedState = updatedState;
+                this.forceUpdate();
+            }
+
+            componentWillMount () {
+              node.value[name]._subscribers.push(this.updateComponent);
+              node.value[name].notifySubscribers();
+            }
+        }
+      }
+      // node.modifiers.keySubscribe = (key, callback) => {
+      //   const name = node.name + "_" + key;
+      //   // return class Component extends React.Component {
+      //   //   constructor() {
+      //   //     super();
+
+      //   //     this.updateComponent = this.updateComponent.bind(this);
+      //   //   }
+
+      //   //   render() {
+      //   //     if(this.updatedState){
+      //   //         this.props = Object.assign(this.props.props, this.props, this.updatedState);
+      //   //     } else {
+      //   //         this.props = Object.assign({i: this.props.i}, this.props.props);
+      //   //     }
+      //   //     console.log('props', this.props)
+      //   //     return (callback);
+      //   //   }
+
+      //   //   componentDidMount () {
+      //   //     node.value[name]._subscribers.push(this.updateComponent);
+      //   //     console.log(node);
+      //   //     this.updateComponent();
+      //   //     //node.notifySubscribers();
+      //   //     console.log(this.props)
+      //   //     console.log('I DID MOUNT');
+      //   //   }
+
+      //   //   updateComponent(updatedState) {
+      //   //     console.log('COMPONENT RERENDER')
+      //   //     this.updatedState = updatedState;
+      //   //     this.forceUpdate();
+      //   //   }
+      //   // }
+      // }
+    }
+  });
 
   return silo;
 }
 
+function applyToSilo(callback){
+
+  for(let i in silo){
+    inner(silo[i], callback)
+  }
+
+  function inner(head, callback){
+    callback(head);
+
+    if(typeof head.value !== 'object'){ return } //base case
+
+    else {
+      for(let i in head.value){
+        inner(head.value[i], callback)
+      }
+    }
+  }
+}
+
 // combineNodes(ButtState, NavState, AppState); // testing purposes
-// console.log(silo.AppState.value.NavState.value.ButtState.getState());
-// silo.AppState.value.NavState.value.ButtState.getState();
+// combineNodes(AppState, NavState); // testing purposes
+// console.log("beginning case", silo.AppState.value.cart);
+// silo.AppState.value.cart.modifiers.addItem({two: 2});
+// silo.AppState.value.cart.modifiers.addItem({three: 3});
+
+// setTimeout(() => console.log("end case", silo.AppState.value.cart), 1000);
+
+// console.log(silo.AppState.getState());
+// silo.AppState.value.NavState.value.cart.subscribers.push((state) => {console.log('STATE', state)});
+// silo.AppState.value.NavState.value.cart.modifiers.addItem({two: 2});
+
+// silo.AppState.value.cart.modifiers.addItem({two: 3, five: 5});
+// setTimeout(() => {console.log('delay', silo.AppState.value.NavState.getState())}, 1000);
+// setTimeout(() => {console.log('Im adding', silo.AppState.value.NavState.getState().addItem({five: 5}))}, 1001);
+// setTimeout(() => {console.log('Im adding again', silo.AppState.value.NavState.getState().addItem({six: 6}))}, 1001);
 
 // ==========> TESTS that calling a parent function will modify its child for nested objects <========== \\
 
@@ -217,8 +329,6 @@ silo.subscribe = (component, name) => {
   }
   
   const searchSilo = (head, name) => {
-    
-      
       let children;
       if(typeof head.value !== 'object') return null;
       else children = head.value;
@@ -233,15 +343,30 @@ silo.subscribe = (component, name) => {
       }
   }
 
+  console.log('Searching for', name);
   let foundNode;
-  for(let i in this){
-    if(this[i] instanceof SiloNode){
-      console.log(i);
-      foundNode = searchSilo(this[i], name)
+  for(let i in silo){
+    if(silo[i].constructor === SiloNode){
+      if(i === name) {
+        foundNode = silo[i];
+      } else {
+        foundNode = searchSilo(silo[i], name)
+      }
       if(!!foundNode){
         foundNode._subscribers.push(component)
+        if(typeof foundNode.value === 'object'){
+          for(let i in foundNode.value){
+            if(i.slice(-5) !== 'State'){
+              foundNode.value[i]._subscribers.push(component);
+            }
+          }
+        }
       }
     }
+  }
+  
+  if(foundNode) {
+    component(foundNode.getState());    
   }
 
   return foundNode;
@@ -252,4 +377,5 @@ silo.subscribe = (component, name) => {
     //add to its subscribers the component;
 }
 
-module.exports = combineNodes;
+export default combineNodes;
+// module.exports = combineNodes;

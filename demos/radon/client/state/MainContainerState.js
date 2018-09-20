@@ -1,13 +1,14 @@
-import StateNode from '../../radon/stateNode.js';
+import StateNode from '../../../../stateNode.js';
 
 const MainContainerState = new StateNode('MainContainerState');
+MainContainerState.parent = 'AppState'
 
-AppState.initializeState({
+MainContainerState.initializeState({
   totalMarkets: 0,
-  totalCards: 0
+  totalCards: 0,
 })
 
-AppState.initializeModifiers({
+MainContainerState.initializeModifiers({
   totalMarkets: {
     incrementMarkets: (current) => {
       return current += 1;
@@ -23,4 +24,4 @@ AppState.initializeModifiers({
   }
 })
 
-export default AppState;
+export default MainContainerState;

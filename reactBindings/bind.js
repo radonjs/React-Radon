@@ -1,24 +1,43 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-function bind(componentToBind) {
-    return class extends React.Component {
+function bind(ComponentToBind) {
+    class WrapperFunction extends React.Component {
+        constructor() {
+            super();
+            this.siloRender = this.siloRender.bind(this);
+        }
+
         componentDidMount() {
-            const {silo} = this.context.silo;
-            this.unsubscribe = silo.subscribe(this.siloRender, componentToBind.prototype.constructor.name);
+            const {silo} = this.context;
+            this.unsubscribe = silo.subscribe(this.siloRender, ComponentToBind.prototype.constructor.name + 'State');
         }
 
         render() {
-            const {silo} = this.context.silo;
-            console.log(componentToBind.contextTypes);
-            return (<componentToBind {...(!!updatedState && updatedState || {})}/>)
+            const {silo} = this.context;
+            let newState = {};
+            if(this.updatedState) {
+                newState = this.updatedState;
+            }
+            return (<ComponentToBind {...this.props} {...newState}/>)
         }
 
         siloRender(updatedState) {
-            this.render();
+            this.previousUpdate = this.updatedState;
+            this.updatedState = updatedState;
+            this.forceUpdate();
         }
 
         componentWillUnmount() {
             this.unsubscribe();
         }
     }
+
+    WrapperFunction.contextTypes = {
+        silo: PropTypes.object
+    }
+
+    return WrapperFunction;
 }
+
+export default bind;
