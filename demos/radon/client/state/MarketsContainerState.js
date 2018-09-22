@@ -1,34 +1,37 @@
-import StateNode from '../../radon/stateNode.js';
+import StateNode from '../../../../stateNode.js';
 
 const MarketsContainerState = new StateNode('MarketsContainerState');
 MarketsContainerState.parent = 'MainContainerState';
 
-AppState.initializeState({
+MarketsContainerState.initializeState({
   marketList: [],
   lastMarketId: 10000,
 })
 
-AppState.initializeModifiers({
+MarketsContainerState.initializeModifiers({
   lastMarketId: {
-    incrementlastMarketId: (current) => {
+    incrementLastMarketId: (current) => {
       return current += 1;
     }
   },
   marketList: {
     addMarket: (current, payload) => {
-      return current.push({
+      current.push({
         marketId: payload.lastMarketId,
         location: payload.location,
         cards: 0,
-      })
+      });
+      return current;
     },
     incrementCard: (current, index, payload) => {
-      return current += 1;
+      let {cards, location, marketId} = current;
+      return {location: location, marketId: marketId, cards: cards + 1};
     },
     decrementCard: (current, index, payload) => {
-      return current -= 1;
+      let {cards, location, marketId} = current;
+      return {location: location, marketId: marketId, cards: cards - 1};
     }
   }
 })
 
-export default AppState;
+export default MarketsContainerState;

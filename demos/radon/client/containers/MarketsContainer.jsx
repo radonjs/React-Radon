@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import MarketCreator from '../components/MarketCreator.jsx'
 import MarketsDisplay from '../components/MarketDisplay.jsx'
+import Market from '../components/Market.jsx';
+import bind from '../../../../reactBindings/bind.js';
 
 // i want these vars: totalCards, marketList, lastMarketId
 
@@ -19,38 +21,33 @@ class MarketsContainer extends Component {
     e.preventDefault();
     const id = 'inputTag';
     const textField = document.getElementById(id);
-    // incrementMarkets();
-    // incrementMarketId();
-    // addMarket({lastMarketId, location});
+    this.props.incrementMarkets();
+    this.props.incrementLastMarketId();
+    this.props.addMarket({lastMarketId: this.props.lastMarketId + 1, location: textField.value});
     textField.value = '';
   }
 
-  addCard(e, i){
+  addCard(e, index){
     e.preventDefault();
-    // incrementTotalCards();
-    // incrementCard(index); (need index... but also the key name);
+    this.props.incrementCards();
+    this.props.incrementCard(index); //(need index... but also the key name);
   }
 
-  deleteCard(e, i) {
+  deleteCard(e, index) {
     e.preventDefault();
-    // decrementTotalCards();
-    // decrementCard(i);
+    this.props.decrementCards();
+    this.props.decrementCard(index);
   }
 
   render() {
-    const markets = this.props.marketList.map((market, i) => (
-        <div key={i} className="marketBox">
-          <div>Market ID: {market.marketId}</div>
-          <div>Location: {market.location}</div>
-          <div>Cards: {market.cards}</div>
-          <div>% of total: {market.cards / this.props.totalCards * 100}</div>
-          <div>
-            <button className={market.marketId} onClick={(e) => {this.addCard(e, i)}}>Add Card</button>
-            <button className={market.marketId} onClick={(e) => {this.deleteCard(e, i)}}>Delete Card</button>
-          </div>
-        </div>
-      )
-    );
+    let markets = [];
+    if(this.props.marketList){
+      markets = this.props.marketList.map((market, i) => {
+          let ArrMarket = this.props.keySubscribe(i, Market);
+          return (<ArrMarket key={i} i={i} addCard={this.addCard} deleteCard={this.deleteCard}/>)
+        }
+      );
+    }
 
     return (
       <div className="innerbox" id="height-probs">
@@ -62,4 +59,4 @@ class MarketsContainer extends Component {
 }
 
 // export default connect(mapStateToProps, mapDispatchToProps)(MarketsContainer);
-export default MarketsContainer;
+export default bind(MarketsContainer);

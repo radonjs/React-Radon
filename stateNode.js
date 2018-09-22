@@ -49,7 +49,7 @@ class StateNode {
   }
 }
 
-module.exports = StateNode;
+export default StateNode;
 
 // developer side example
 

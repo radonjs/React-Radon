@@ -1,4 +1,5 @@
 import React from 'react';
+import bind from '../../../../reactBindings/bind.js';
 
 const MarketDisplay = (props) => (
   <div>
@@ -7,4 +8,4 @@ const MarketDisplay = (props) => (
   </div>
 );
 
-export default MarketDisplay;
+export default bind(MarketDisplay);
