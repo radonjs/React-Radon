@@ -21,7 +21,6 @@ class MarketsContainer extends Component {
     e.preventDefault();
     const id = 'inputTag';
     const textField = document.getElementById(id);
-    //console.log("KEY SUB", this.props.keySubscribe);
     this.props.incrementMarkets();
     this.props.incrementLastMarketId();
     this.props.addMarket({lastMarketId: this.props.lastMarketId + 1, location: textField.value});
@@ -36,8 +35,8 @@ class MarketsContainer extends Component {
 
   deleteCard(e, index) {
     e.preventDefault();
-    // decrementTotalCards();
-    // decrementCard(i);
+    this.props.decrementCards();
+    this.props.decrementCard(index);
   }
 
   render() {
@@ -45,7 +44,7 @@ class MarketsContainer extends Component {
     if(this.props.marketList){
       markets = this.props.marketList.map((market, i) => {
           let ArrMarket = this.props.keySubscribe(i, Market);
-          return (<ArrMarket key={i} i={i} addCard={this.addCard}/>)
+          return (<ArrMarket key={i} i={i} addCard={this.addCard} deleteCard={this.deleteCard}/>)
         }
       );
     }

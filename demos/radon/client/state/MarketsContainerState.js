@@ -16,11 +16,10 @@ MarketsContainerState.initializeModifiers({
   },
   marketList: {
     addMarket: (current, payload) => {
-      console.log('THIS IS THE CURRENT +++++++++++++++++++', JSON.stringify(current));
       current.push({
         marketId: payload.lastMarketId,
         location: payload.location,
-        cards: 10,
+        cards: 0,
       });
       return current;
     },
@@ -29,7 +28,8 @@ MarketsContainerState.initializeModifiers({
       return {location: location, marketId: marketId, cards: cards + 1};
     },
     decrementCard: (current, index, payload) => {
-      return current -= 1;
+      let {cards, location, marketId} = current;
+      return {location: location, marketId: marketId, cards: cards - 1};
     }
   }
 })

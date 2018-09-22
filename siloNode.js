@@ -13,7 +13,6 @@ class SiloNode {
     this.runModifiers = this.runModifiers.bind(this);
     this.notifySubscribers = this.notifySubscribers.bind(this);
     this.getState = this.getState.bind(this);
-    this.runLinkModifiers = this.runLinkModifiers.bind(this);
     this.handleArray = this.handleArray.bind(this);
     this.handleObject = this.handleObject.bind(this);
     this.updateSilo = this.updateSilo.bind(this);
@@ -36,7 +35,6 @@ class SiloNode {
   }
 
   set value(value) {
-    console.log("New Value -", value);
     this._value = value;
   }
 
@@ -51,10 +49,6 @@ class SiloNode {
   get parent() {
     return this._parent;
   }
-
-  // set subscribers() {
-  //   return this._subscribers;
-  // }
 
   get subscribers() {
     return this._subscribers;
@@ -78,13 +72,11 @@ class SiloNode {
     async function run() {
       if (running === false) { // prevents multiple calls from being made if already running
         running = true;
-  
         while (this.queue.length > 0) {
           this.value = await this.queue.shift()();
           if (this.type !== 'PRIMITIVE') this.value = this.updateSilo().value;
           this.notifySubscribers();
         }
-
         running = false;   
       } else {
         return 'in progress...';
@@ -126,16 +118,11 @@ class SiloNode {
     return node;
   }
 
-  runLinkModifiers(nodeName) {
-    // this.name = nodeName;
-    this.linkModifiers(nodeName, this.modifiers);
-  }
-
-  linkModifiers(nodeName, stateModifiers) {
+  linkModifiers(nodeName = this.name, stateModifiers = this.modifiers) {
     if (!stateModifiers || Object.keys(stateModifiers).length === 0) return;
-    //const that = this;
+    const that = this;
     // looping through every modifier added by the dev
-    Object.keys(stateModifiers).forEach((modifierKey => {
+    Object.keys(stateModifiers).forEach(modifierKey => {
       const modifier = stateModifiers[modifierKey];
 
       if (typeof modifier !== 'function' ) throw new TypeError(); 
@@ -144,40 +131,38 @@ class SiloNode {
       else if (modifier.length <= 2) {
         // wrap the dev's modifier function so we can pass the current node value into it
         let linkedModifier;
-        if (this.type === 'PRIMITIVE') {linkedModifier = async (payload) => await modifier(this.value, payload);} 
+        if (that.type === 'PRIMITIVE') linkedModifier = async (payload) => await modifier(that.value, payload);
         // that.value is an object and we need to reassemble it
-        else if (this.type === 'OBJECT') {
-          const value = handleObject(nodeName, this);
-          linkedModifier = async (payload) => await modifier(value, payload);
+        else if (that.type === 'OBJECT') {
+          linkedModifier = async (payload) => await modifier(this.handleObject(nodeName, that), payload);
         }
-        else if (this.type === 'ARRAY') {
-          const value = this.handleArray(nodeName, this);
-          linkedModifier = async (payload) => await modifier(value, payload);
+        else if (that.type === 'ARRAY') {
+          linkedModifier = async (payload) => await modifier(this.handleArray(nodeName, that), payload);
         }
 
         // the function that will be called when the dev tries to call their modifier
-        stateModifiers[modifierKey] = payload => {
+        this.modifiers[modifierKey] = payload => {
           // wrap the linkedModifier again so that it can be added to the async queue without being invoked
           const callback = async () => await linkedModifier(payload);
-          this.queue.push(callback);
-          this.runQueue();
+          that.queue.push(callback);
+          that.runQueue();
         }
       }
 
       // adds middleware that will affect the value of a child node of index
       else if (modifier.length > 2) {
         // wrap the dev's modifier function so we can pass the current node value into it
-        const linkedModifier = async (index, payload) => await modifier(this.handle(this.value[index], index), index, payload); 
+        const linkedModifier = async (index, payload) => await modifier(this.handle(that.value[index], index), index, payload); 
 
         // the function that will be called when the dev tries to call their modifier
-        stateModifiers[modifierKey] = (index, payload) => {
+        this.modifiers[modifierKey] = (index, payload) => {
           // wrap the linkedModifier again so that it can be added to the async queue without being invoked
           const callback = async () => await linkedModifier(`${this.name}_${index}`, payload);
-          this.value[`${this.name}_${index}`].queue.push(callback);
-          this.value[`${this.name}_${index}`].runQueue();
+          that.value[`${this.name}_${index}`].queue.push(callback);
+          that.value[`${this.name}_${index}`].runQueue();
         }
       }
-    }).bind(this))
+    })
   }
 
   handle(node, name) {
@@ -208,22 +193,15 @@ class SiloNode {
   }
 
   handleArray(name, obj) {
-    console.log('THIS IS THE OBJ', obj/*obj.getState(obj)*/);
-    //obj = obj.getState();
     const newArray = [];
     // loop through array indices currently stored as nodes
-    console.log("THIS IS OBJ", obj);
     Object.keys(obj.value).forEach((key, i) => {
       const childObj = obj.value[key];
-      if(childObj.value.marketList_0_cards){
-      console.log("CHILD OBJ", childObj.value.marketList_0_cards.value);
-      }
       if (childObj.type === 'ARRAY') {
         newArray.push(this.handleArray(`${name}_${i}`, childObj));
       } else if (childObj.type === 'OBJECT') {
         newArray.push(this.handleObject(`${name}_${i}`, childObj))
       } else if (childObj.type === 'PRIMITIVE') {
-        console.log(childObj);
         newArray.push(childObj.value);
       }
     })
