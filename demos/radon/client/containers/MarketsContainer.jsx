@@ -3,6 +3,7 @@ import MarketCreator from '../components/MarketCreator.jsx'
 import MarketsDisplay from '../components/MarketDisplay.jsx'
 import Market from '../components/Market.jsx';
 import bind from '../../../../reactBindings/bind.js';
+import objectBind from '../../../../reactBindings/objectBind.js';
 
 // i want these vars: totalCards, marketList, lastMarketId
 
@@ -43,7 +44,7 @@ class MarketsContainer extends Component {
     let markets = [];
     if(this.props.marketList){
       markets = this.props.marketList.map((market, i) => {
-          let ArrMarket = this.props.keySubscribe(i, Market);
+          let ArrMarket = objectBind(Market, i, this.props);
           return (<ArrMarket key={i} i={i} addCard={this.addCard} deleteCard={this.deleteCard}/>)
         }
       );

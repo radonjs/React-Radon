@@ -209,69 +209,11 @@ function combineNodes(...args) {
   
   applyToSilo(node => {
     if(node.type === 'OBJECT' || node.type === "ARRAY"){
-      node.modifiers.keySubscribe = (key, ComponentToBind) => {
+      node.modifiers.keySubscribe = (key, renderFunc) => {
         const name = node.name + "_" + key;
-        return class Component extends React.Component {
-            constructor() {
-              super();
-
-              this.updateComponent = this.updateComponent.bind(this);
-            }
-
-            render() {
-              let newState = {};
-              if(this.updatedState) {
-                newState = this.updatedState;
-              }
-              return (<ComponentToBind {...this.props} {...newState} />);
-            }
-
-            updateComponent(updatedState) {
-                this.updatedState = updatedState;
-                this.forceUpdate();
-            }
-
-            componentWillMount () {
-              node.value[name]._subscribers.push(this.updateComponent);
-              node.value[name].notifySubscribers();
-            }
-        }
+        node.value[name]._subscribers.push(renderFunc);
+        node.value[name].notifySubscribers();
       }
-      // node.modifiers.keySubscribe = (key, callback) => {
-      //   const name = node.name + "_" + key;
-      //   // return class Component extends React.Component {
-      //   //   constructor() {
-      //   //     super();
-
-      //   //     this.updateComponent = this.updateComponent.bind(this);
-      //   //   }
-
-      //   //   render() {
-      //   //     if(this.updatedState){
-      //   //         this.props = Object.assign(this.props.props, this.props, this.updatedState);
-      //   //     } else {
-      //   //         this.props = Object.assign({i: this.props.i}, this.props.props);
-      //   //     }
-      //   //     console.log('props', this.props)
-      //   //     return (callback);
-      //   //   }
-
-      //   //   componentDidMount () {
-      //   //     node.value[name]._subscribers.push(this.updateComponent);
-      //   //     console.log(node);
-      //   //     this.updateComponent();
-      //   //     //node.notifySubscribers();
-      //   //     console.log(this.props)
-      //   //     console.log('I DID MOUNT');
-      //   //   }
-
-      //   //   updateComponent(updatedState) {
-      //   //     console.log('COMPONENT RERENDER')
-      //   //     this.updatedState = updatedState;
-      //   //     this.forceUpdate();
-      //   //   }
-      //   // }
-      // }
     }
   });
 
