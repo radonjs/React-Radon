@@ -1,10 +1,10 @@
-let StateNode = require('./stateNode.js');
+let ConstructorNode = require('./constructorNode.js');
 
 describe('State Node Class', () => {
-    let testNode = new StateNode('test');
+    let testNode = new ConstructorNode('test');
     test('State Node should construct State Node Objects', () => {
         
-        expect(testNode instanceof StateNode).toBeTruthy();
+        expect(testNode instanceof ConstructorNode).toBeTruthy();
     })
 
     describe('State nodes Methods', () => {

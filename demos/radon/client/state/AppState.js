@@ -1,6 +1,6 @@
-import StateNode from '../../../../stateNode.js';
+import ConstructorNode from '../../../../constructorNode.js';
 
-const AppState = new StateNode('AppState');
+const AppState = new ConstructorNode('AppState');
 AppState.parent = 'root';
 
 AppState.initializeState({
