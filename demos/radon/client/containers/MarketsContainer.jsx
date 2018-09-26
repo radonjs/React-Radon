@@ -5,11 +5,6 @@ import Market from '../components/Market.jsx';
 import bind from '../../../../reactBindings/bind.js';
 import objectBind from '../../../../reactBindings/objectBind.js';
 
-// i want these vars: totalCards, marketList, lastMarketId
-
-// these modifiers: incrementMarkets, incrementMarketId, addMarket, 
-// incrementTotalCards, incrementCard, decrementCards, decrementTotalCards
-
 class MarketsContainer extends Component {
   constructor(props) {
     super(props);
@@ -31,7 +26,7 @@ class MarketsContainer extends Component {
   addCard(e, index){
     e.preventDefault();
     this.props.incrementCards();
-    this.props.incrementCard(index); //(need index... but also the key name);
+    this.props.incrementCard(index);
   }
 
   deleteCard(e, index) {
@@ -59,5 +54,4 @@ class MarketsContainer extends Component {
   }
 }
 
-// export default connect(mapStateToProps, mapDispatchToProps)(MarketsContainer);
 export default bind(MarketsContainer);

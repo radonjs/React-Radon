@@ -1,6 +1,6 @@
-import StateNode from '../../../../stateNode.js';
+import ConstructorNode from '../../../../constructorNode.js';
 
-const MarketsContainerState = new StateNode('MarketsContainerState');
+const MarketsContainerState = new ConstructorNode('MarketsContainerState');
 MarketsContainerState.parent = 'MainContainerState';
 
 MarketsContainerState.initializeState({
