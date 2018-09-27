@@ -185,6 +185,7 @@ function forEachSiloNode(callback) {
 
 // ==========> END TESTS that calling a parent function will modify its child for nested objects <========== \\
 
+// renderFunction takes a siloNode argument
 silo.subscribe = (renderFunction, name) => {
 
   if (!name) {
