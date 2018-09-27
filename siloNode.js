@@ -1,5 +1,5 @@
-import * as types from './constants.js';
-// const types = require('./constants.js');
+// import * as types from './constants.js';
+const types = require('./constants.js');
 
 class SiloNode {
   constructor(name, value, parent = null, modifiers = {}, type = types.PRIMITIVE) {
@@ -79,6 +79,15 @@ class SiloNode {
 
   set type(type) {
     this._type = type;
+  }
+
+  // do we need this?
+  pushToSubscribers(renderFunction){
+    this.subscribers.push(renderFunction);
+  }
+
+  removeFromSubscribersAtIndex(index){
+    this.subcribers = this.subscribers.slice(index, 1);
   }
 
   notifySubscribers() {
@@ -258,5 +267,5 @@ class SiloNode {
   }
 }
 
-export default SiloNode;
-// module.exports = SiloNode;
+// export default SiloNode;
+module.exports = SiloNode;
