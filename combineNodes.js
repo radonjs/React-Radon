@@ -1,12 +1,12 @@
 // import state class for instanceof check
-// const ConstructorNode = require('./constructorNode.js');
-// const SiloNode = require('./siloNode.js');
-// const types = require('./constants.js');
+const ConstructorNode = require('./constructorNode.js');
+const SiloNode = require('./siloNode.js');
+const types = require('./constants.js');
 
 // import state class for instanceof check
-import ConstructorNode from './constructorNode.js';
-import SiloNode from './siloNode.js';
-import * as types from './constants.js'
+// import ConstructorNode from './constructorNode.js';
+// import SiloNode from './siloNode.js';
+// import * as types from './constants.js'
 
 // ==================> SILO TESTING <=================== \\
 
@@ -128,12 +128,14 @@ function combineNodes(...args) {
     silo[rootSiloNode] = wrappedRootSiloNode[rootSiloNode];
   });
   
-  applyToSilo(node => {
-    if(node.type === 'OBJECT' || node.type === "ARRAY"){
+  forEachSiloNode(node => {
+    // apply keySubscribe only to object and array silo nodes
+    if (node.type === 'OBJECT' || node.type === "ARRAY") {
       node.modifiers.keySubscribe = (key, renderFunc) => {
         const name = node.name + "_" + key;
-        node.value[name]._subscribers.push(renderFunc);
+        const subscribedAtIndex = node.value[name].pushToSubscribers(renderFunc);
         node.value[name].notifySubscribers();
+        return () => {node.removeFromSubscribersAtIndex(subscribedAtIndex)}
       }
     }
   });
@@ -141,19 +143,26 @@ function combineNodes(...args) {
   return silo;
 }
 
-function applyToSilo(callback) {
+// callbacks have to accept a SILONODE
+function forEachSiloNode(callback) {
   // accessing the single root in the silo
   Object.keys(silo).forEach(siloNodeRootKey => {
     inner(silo[siloNodeRootKey], callback);
   })
 
-  function inner (head, callback) {
-    callback(head);
-    if (typeof head.value !== 'object') return; // recursive base case
-    else {
-      Object.keys(head.value).forEach(key => {
-        inner(head.value[key], callback);
-      })
+  // recursively navigate to every siloNode
+  function inner(head, callback) {
+    if (head.constructor.name === 'SiloNode') {
+      callback(head);
+      if (head.type === types.PRIMITIVE) return; // recursive base case
+      
+      else {
+        Object.keys(head.value).forEach(key => {
+          if (head.value[key].constructor.name === 'SiloNode') {
+            inner(head.value[key], callback);
+          }
+        })
+      }
     }
   }
 }
@@ -176,58 +185,40 @@ function applyToSilo(callback) {
 
 // ==========> END TESTS that calling a parent function will modify its child for nested objects <========== \\
 
-silo.subscribe = (component, name) => { //renderFunction
-  if(!name && !component.prototype){ //reformat to remove this if
-      throw new Error('you cant use an anonymous function in subscribe without a name argument'); //use new
-  } else if (!name && !!component.prototype){
-      name = component.prototype.constructor.name + 'State'
-  }
-  
-  const searchSilo = (head /*currSiloNode*/, name) => {
-      let children;
-      if (typeof head.value !== 'object') return null; //Use SiloNode Type System
-      else children = head.value;
+silo.subscribe = (renderFunction, name) => {
 
-      for (let i in children){ //air bnb rules plz
-          if (i === name){
-              return children[i]
-          } else {
-              let foundNode = searchSilo(children[i], name);
-              if (!!foundNode){return foundNode};
-          }
-      }
+  if (!name) {
+    if (!!renderFunction.prototype) {
+      name = renderFunction.prototype.constructor.name + 'State';
+    } else {
+      throw new Error('You can\'t use an anonymous function in subscribe without a name argument.');
+    }
   }
 
   let foundNode;
   let subscribedAtIndex;
-  for (let i in silo) { //air bnb plz
-    if (silo[i].constructor === SiloNode){
-      if (i === name) {
-        foundNode = silo[i];
-      } else {
-        foundNode = searchSilo(silo[i], name)
-      }
-      if (!!foundNode){
-        foundNode.subscribers.push(component)
-        if (typeof foundNode.value === 'object'){
-          for (let i in foundNode.value){
-            if (i.slice(-5) !== 'State'){
-              subscribedAtIndex = foundNode.value[i].subscribers.push(component);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  if (foundNode) component(foundNode.getState());
 
-  function unsubscribe () {
-    foundNode._subscribers.splice(subscribedAtIndex, 1);
+  forEachSiloNode(node => {
+    if (node.name === name) {
+      // change to node.subscribers.push(renderFunction);
+      // renderFunction 'this' is bound to a React component
+      subscribedAtIndex = node.pushToSubscribers(renderFunction);
+      foundNode = node;
+    }
+  })
+  
+  function unsubscribe() {
+    foundNode.removeFromSubscribersAtIndex(subscribedAtIndex);
+  }
+
+  if (!!foundNode) {
+    renderFunction(foundNode.getState())
+  } else {
+    console.error(new Error('You are trying to subscribe to something that isn\'t in the silo.'));
   }
 
   return unsubscribe;
 }
 
-export default combineNodes;
-// module.exports = combineNodes;
+// export default combineNodes;
+module.exports = combineNodes;
