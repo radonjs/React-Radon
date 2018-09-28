@@ -59,8 +59,8 @@ class ConstructorNode {
   }
 }
 
-// export default ConstructorNode;
-module.exports = ConstructorNode;
+export default ConstructorNode;
+// module.exports = ConstructorNode;
 
 // developer side example
 

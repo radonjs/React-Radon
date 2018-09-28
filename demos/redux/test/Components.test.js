@@ -1,12 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import { shallow, render, mount } from 'enzyme';
+import { mount } from 'enzyme';
 
 import App from '../client/App';
 import MainContainer from '../client/containers/MainContainer'
 import MarketsContainer from '../client/containers/MainContainer'
-import reducers from './../client/reducers/reducers';
+import reducers from '../client/reducers/reducers';
 import TotalsDisplay from '../client/components/TotalsDisplay'
 import MarketCreator from '../client/components/MarketCreator';
 import MarketDisplay from '../client/components/MarketDisplay'

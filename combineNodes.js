@@ -1,12 +1,11 @@
 // import state class for instanceof check
-const ConstructorNode = require('./constructorNode.js');
-const SiloNode = require('./siloNode.js');
-const types = require('./constants.js');
+// const ConstructorNode = require('./constructorNode.js');
+// const SiloNode = require('./siloNode.js');
+// const types = require('./constants.js');
 
 // import state class for instanceof check
-// import ConstructorNode from './constructorNode.js';
-// import SiloNode from './siloNode.js';
-// import * as types from './constants.js'
+import SiloNode from './siloNode.js';
+import * as types from './constants.js'
 
 // ==================> SILO TESTING <=================== \\
 
@@ -221,5 +220,5 @@ silo.subscribe = (renderFunction, name) => {
   return unsubscribe;
 }
 
-// export default combineNodes;
-module.exports = combineNodes;
+export default combineNodes;
+// module.exports = combineNodes;

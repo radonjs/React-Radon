@@ -21,10 +21,6 @@ class App extends Component {
   render() {
     return(
       <MainContainer />
-      // <div><p>{this.props.testing}</p>
-      // <button onClick={this.increment}>Increment</button>
-      // <button onClick={this.decrement}>Decrement</button>
-      // </div>
     )
   }
 }
