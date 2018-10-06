@@ -8,7 +8,7 @@ function bind(ComponentToBind) {
             this.siloRender = this.siloRender.bind(this);
         }
 
-        componentDidMount() {
+        componentWillMount() {
             const {silo} = this.context;
             this.unsubscribe = silo.subscribe(this.siloRender, ComponentToBind.prototype.constructor.name + 'State');
         }

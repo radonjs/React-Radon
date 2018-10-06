@@ -7,14 +7,14 @@ class MainContainer extends Component {
   constructor(props) {
     super(props);
   }
-
+  
   render() {
     return(
       <div className="container">
         <div className="outerBox">
           <h1 id="header">MegaMarket Loyalty Cards</h1>
-          <TotalsDisplay totalCards={this.props.totalCards} totalMarkets={this.props.totalMarkets}/>
-          <MarketsContainer increment={this.props.incrementCards}/>
+          <TotalsDisplay totalCards={this.props.val.totalCards.val} totalMarkets={this.props.val.totalMarkets.val}/>
+          <MarketsContainer increment={this.props.val.totalCards.incrementCards}/>
         </div>
       </div>
     )
