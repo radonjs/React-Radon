@@ -7,7 +7,7 @@ const MarketCreator = props => (
       <form>
         <span>Location: </span>
         <input type='text' id='inputTag'/>
-        <button onClick={props.onClick}>Add Market</button>
+        <button id='addMarket' onClick={props.addLocation}>Add Market</button>
       </form>
     </div>
   </div>

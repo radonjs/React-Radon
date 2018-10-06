@@ -28,7 +28,12 @@ class MarketsContainer extends Component {
   addLocation(e){
     e.preventDefault();
     const id = 'inputTag';
-    const textField = document.getElementById(id);
+    let textField = document.getElementById(id);
+    // for testing purposes
+    if (!textField) {
+      textField = {};
+      textField.value = Math.floor(Math.random() * 1000);
+    }
     this.props.onNewLocationClick(textField.value);
     textField.value = '';
   }
@@ -51,8 +56,8 @@ class MarketsContainer extends Component {
           <div>Cards: {market.cards}</div>
           <div>% of total: {Math.floor(market.cards / this.props.totalCards * 100) || 0}</div>
           <div>
-            <button className={market.marketId} onClick={(e) => {this.addCard(e, i)}}>Add Card</button>
-            <button className={market.marketId} onClick={(e) => {this.deleteCard(e, i)}}>Delete Card</button>
+            <button id='addCard' className={market.marketId} onClick={(e) => {this.addCard(e, i)}}>Add Card</button>
+            <button id='deleteCard' className={market.marketId} onClick={(e) => {this.deleteCard(e, i)}}>Delete Card</button>
           </div>
         </div>
       )
@@ -60,7 +65,7 @@ class MarketsContainer extends Component {
 
     return (
       <div className="innerbox" id="height-probs">
-        <MarketCreator onClick={this.addLocation} />
+        <MarketCreator addLocation={this.addLocation} />
         <MarketsDisplay marketList={markets}/>
       </div>
     );

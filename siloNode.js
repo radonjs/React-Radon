@@ -81,6 +81,15 @@ class SiloNode {
     this._type = type;
   }
 
+  // do we need this?
+  pushToSubscribers(renderFunction){
+    this.subscribers.push(renderFunction);
+  }
+
+  removeFromSubscribersAtIndex(index){
+    this.subcribers = this.subscribers.slice(index, 1);
+  }
+
   notifySubscribers() {
     if (this.subscribers.length === 0) return;
     this.subscribers.forEach(func => {
