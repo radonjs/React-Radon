@@ -102,6 +102,7 @@ class SiloNode {
     this._type = type;
   }
 
+<<<<<<< HEAD
   get virtualNode(){
     return this._virtualNode
   }
@@ -116,6 +117,9 @@ class SiloNode {
 
  
 
+=======
+  // do we need this?
+>>>>>>> master
   pushToSubscribers(renderFunction){
     this.subscribers.push(renderFunction);
   }
@@ -124,6 +128,7 @@ class SiloNode {
     this.subcribers = this.subscribers.slice(index, 1);
   }
 
+<<<<<<< HEAD
   //there's no setter for the ID because you cant set it directly. you have to use issueID
 
   //issueID MUST BE CALLED ON THE NODES IN ORDER ROOT TO LEAF. it always assumes that this node's parent will
@@ -136,6 +141,8 @@ class SiloNode {
     }
   }
 
+=======
+>>>>>>> master
   notifySubscribers() {
     if (this.subscribers.length === 0) return;
     this.subscribers.forEach(func => {

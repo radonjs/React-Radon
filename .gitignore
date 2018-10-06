@@ -9,3 +9,7 @@ demos/.DS_Store
 package-lock.json
 demos/radon/build/bundle.js
 demos/radon/package-lock.json
+
+demos/redux/package-lock.json
+demos/radon/package-lock.json
+demos/radon/build/

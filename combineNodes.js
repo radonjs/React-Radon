@@ -12,6 +12,11 @@ const virtualSilo = {};
  * @param  {...ConstructorNode} args - A list of constructor Nodes
  */
 
+/**
+ * Takes all of the constructorNodes created by the developer
+ * @param  {...ConstructorNode} args - A list of constructor Nodes
+ */
+
 function combineNodes(...args) {
   if (args.length === 0) throw new Error('combineNodes function takes at least one constructorNode');
 
@@ -168,6 +173,7 @@ silo.subscribe = (renderFunction, name) => {
     }
   }
 
+  console.log('Searching for', name);
   let foundNode;
   let subscribedAtIndex;
   const foundNodeChildren = [];
@@ -205,7 +211,12 @@ silo.subscribe = (renderFunction, name) => {
     console.error(new Error('You are trying to subscribe to something that isn\'t in the silo.'));
   }
 
-  return unsubscribe;
+  return foundNode;
+
+    //if there's no name assume the name is component name + 'State'
+    //recursively search through silo from headnode
+    //find something with name === name;
+    //add to its subscribers the component;
 }
 
 export default combineNodes;
