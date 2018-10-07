@@ -11,38 +11,46 @@ class MarketsContainer extends Component {
     this.addLocation = this.addLocation.bind(this);
     this.addCard = this.addCard.bind(this);
     this.deleteCard = this.deleteCard.bind(this);
+    console.log('this.props from MC Constructor: ', this.props)
   }
 
   addLocation(e){
     e.preventDefault();
     const id = 'inputTag';
     const textField = document.getElementById(id);
-    this.props.incrementMarkets();
-    this.props.incrementLastMarketId();
-    this.props.addMarket({lastMarketId: this.props.lastMarketId + 1, location: textField.value});
+    this.props.parent.val.totalMarkets.incrementMarkets()
+    this.props.val.lastMarketId.incrementLastMarketId();
+    this.props.val.marketList.addMarket({lastMarketId: this.props.val.lastMarketId.val + 1, location: textField.value});
     textField.value = '';
   }
 
   addCard(e, index){
+  console.log('functions from addcard', this.props);
     e.preventDefault();
-    this.props.incrementCards();
-    this.props.incrementCard(index);
+    this.props.parent.val.totalCards.incrementCards();
+    this.props.val.marketList.incrementCard(index);
   }
 
   deleteCard(e, index) {
+    console.log('functions from delcard', this.props);
     e.preventDefault();
-    this.props.decrementCards();
-    this.props.decrementCard(index);
+    this.props.parent.val.totalCards.decrementCards();
+    this.props.val.marketList.decrementCard(index);
   }
 
   render() {
     let markets = [];
-    if(this.props.marketList){
-      markets = this.props.marketList.map((market, i) => {
-          let ArrMarket = objectBind(Market, i, this.props);
-          return (<ArrMarket key={i} i={i} addCard={this.addCard} deleteCard={this.deleteCard}/>)
-        }
-      );
+    if(this.props.val.marketList.val){
+      let marketData = this.props.val.marketList.val;
+
+      for(let i in marketData){
+        console.log(marketData[i])
+        let ArrMarket = objectBind(Market, i, this.props.val.marketList);
+        console.log('ArrMarket: ', ArrMarket);
+        markets.push(<ArrMarket key={i} i={i} addCard={this.addCard} deleteCard={this.deleteCard}/>)
+      }
+      
+      console.log('markets: ', markets);
     }
 
     return (
