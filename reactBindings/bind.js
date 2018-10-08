@@ -31,14 +31,6 @@ function bind(ComponentToBind) {
         componentWillUnmount() {
             this.unsubscribe();
         }
-    
-
-    componentDidMount() {
-      // this.context, the context api is a part of react, the silo was added to this.context in the Provider Wrapper
-      const {silo} = this.context;
-      // this.subscribe returns the unsubscribe method
-      this.unsubscribe = silo.subscribe(this.siloRender, ComponentToBind.prototype.constructor.name + 'State');
-    }
 
     render() {
       let newState = {};
