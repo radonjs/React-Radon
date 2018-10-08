@@ -1,6 +1,6 @@
 {
   "name": "react-radon",
-  "version": "1.0.6",
+  "version": "1.0.12",
   "description": "Radon is an object-oriented state management framework for JavaScript applications.",
   "main": "build/bundle.js",
   "files": [

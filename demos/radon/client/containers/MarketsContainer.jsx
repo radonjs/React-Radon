@@ -10,7 +10,6 @@ class MarketsContainer extends Component {
     this.addLocation = this.addLocation.bind(this);
     this.addCard = this.addCard.bind(this);
     this.deleteCard = this.deleteCard.bind(this);
-    console.log('this.props from MC Constructor: ', this.props)
   }
 
   addLocation(e){
@@ -24,14 +23,12 @@ class MarketsContainer extends Component {
   }
 
   addCard(e, index){
-  console.log('functions from addcard', this.props);
     e.preventDefault();
     this.props.parent.val.totalCards.incrementCards();
     this.props.val.marketList.incrementCard(index);
   }
 
   deleteCard(e, index) {
-    console.log('functions from delcard', this.props);
     e.preventDefault();
     this.props.parent.val.totalCards.decrementCards();
     this.props.val.marketList.decrementCard(index);
@@ -43,13 +40,10 @@ class MarketsContainer extends Component {
       let marketData = this.props.val.marketList.val;
 
       for(let i in marketData){
-        console.log(marketData[i])
         let ArrMarket = objectBind(Market, i, this.props.val.marketList);
-        console.log('ArrMarket: ', ArrMarket);
         markets.push(<ArrMarket key={i} i={i} addCard={this.addCard} deleteCard={this.deleteCard}/>)
       }
       
-      console.log('markets: ', markets);
     }
 
     return (

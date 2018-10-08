@@ -24,7 +24,6 @@ MarketsContainerState.initializeModifiers({
       return current;
     },
     incrementCard: (current, index, payload) => {
-      console.log(current, index);
       let {cards, location, marketId} = current;
       return {location: location, marketId: marketId, cards: cards + 1};
     },
