@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import MarketCreator from '../components/MarketCreator.jsx'
 import MarketsDisplay from '../components/MarketDisplay.jsx'
 import Market from '../components/Market.jsx';
-import bind from '../../../../reactBindings/bind.js';
-import objectBind from '../../../../reactBindings/objectBind.js';
+import {bind, objectBind} from 'react-radon';
 
 class MarketsContainer extends Component {
   constructor(props) {

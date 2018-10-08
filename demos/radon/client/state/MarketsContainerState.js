@@ -1,6 +1,6 @@
-import ConstructorNode from '../../../../constructorNode.js';
+import {StateNode} from 'radon-js';
 
-const MarketsContainerState = new ConstructorNode('MarketsContainerState');
+const MarketsContainerState = new StateNode('MarketsContainerState');
 MarketsContainerState.parent = 'MainContainerState';
 
 MarketsContainerState.initializeState({

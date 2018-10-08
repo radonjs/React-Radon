@@ -1,5 +1,5 @@
 import React from 'react';
-import bind from '../../../../reactBindings/bind.js';
+import {bind} from 'react-radon';
 
 const MarketDisplay = (props) => (
   <div>
