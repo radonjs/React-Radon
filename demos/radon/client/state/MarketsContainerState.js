@@ -1,6 +1,6 @@
-import ConstructorNode from '../../../../constructorNode.js';
+import {StateNode} from 'radon-js';
 
-const MarketsContainerState = new ConstructorNode('MarketsContainerState');
+const MarketsContainerState = new StateNode('MarketsContainerState');
 MarketsContainerState.parent = 'MainContainerState';
 
 MarketsContainerState.initializeState({
@@ -24,7 +24,6 @@ MarketsContainerState.initializeModifiers({
       return current;
     },
     incrementCard: (current, index, payload) => {
-      console.log(current, index);
       let {cards, location, marketId} = current;
       return {location: location, marketId: marketId, cards: cards + 1};
     },

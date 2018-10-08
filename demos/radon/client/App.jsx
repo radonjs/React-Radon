@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import MainContainer from './containers/MainContainer.jsx';
-import bind from '../../../reactBindings/bind.js';
+import {bind} from 'react-radon';
 
 class App extends Component {
   constructor(props) {

@@ -1,6 +1,6 @@
-import ConstructorNode from '../../../../constructorNode.js';
+import {StateNode} from 'radon-js';
 
-const AppState = new ConstructorNode('AppState');
+const AppState = new StateNode('AppState');
 AppState.parent = 'root';
 
 AppState.initializeState({

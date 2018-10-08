@@ -3,7 +3,6 @@ import React from 'react';
 class Market extends React.Component {
   render() { 
     let thisMarket = this.props.val.marketList.val[this.props.i];
-    // console.log('this.props from market!', this.props, thisMarket);
     let totalCards = this.props.parent.val.totalCards.val //TOTALCARDS IS IN MAINCONTAINER YOU GOTTA GO GET IT BOY
     return (<div className="marketBox">
     <div>Market ID: {this.props.val.marketList.val[this.props.i].val.marketId.val}</div>

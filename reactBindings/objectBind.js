@@ -27,7 +27,7 @@ function objectBind(ComponentToBind, key, siloObject) {
     }
 
     componentWillUnmount() {
-      this.unsubscribe();
+      //this.unsubscribe();
     }
   }
 

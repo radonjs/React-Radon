@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import TotalsDisplay from '../components/TotalsDisplay.jsx';
 import MarketsContainer from './MarketsContainer.jsx'
-import bind from '../../../../reactBindings/bind.js';
+import {bind} from 'react-radon';
 
 class MainContainer extends Component {
   constructor(props) {

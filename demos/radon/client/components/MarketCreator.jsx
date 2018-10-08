@@ -1,5 +1,5 @@
 import React from 'react';
-import bind from '../../../../reactBindings/bind.js';
+import {bind} from 'react-radon';
 
 class MarketCreator extends React.Component {
   render() { 
