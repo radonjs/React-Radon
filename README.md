@@ -2,6 +2,8 @@
 
 Radon is an object-oriented state management framework for JavaScript applications.
 
+Read our documentation at [radonjs.org](http://radonjs.org)
+
 ## Getting Started
 
 To install the stable version using npm as your package manager:
